@@ -35,7 +35,7 @@ class alpha_client():
         self.logger = logger.Logger(mongo_connection_string)
         self.max_error_attempts = 5
         self.simulation_sleep = 0.5
-        self.pause = 5
+        self.pause = 2
 
     # Usual usage: move alpha from purgatory to prod or trash
     def move_alpha_from_to(self, alpha, total_result, collection_old, collection_new, collection_simulate, inverse=False):
@@ -154,7 +154,7 @@ class alpha_client():
                     stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
                                                                   index=alphas[i]['Index']).content)
                     try:
-                        if (stats['error'] == '') & (stats['status'] == True) & (len(stats['result']) > 0):
+                        if (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
                             result = stats['result'][-1]
                             if abs(result['Fitness']) < 0.8:
                                 inverse = result['Fitness'] < 0
@@ -168,7 +168,7 @@ class alpha_client():
                             elif (abs(result['Fitness']) < 1.1) | (abs(result['Sharpe']) < 1.25):
                                 inverse = result['Fitness'] < 0
                                 result = self.alpha_stats_abs(total_result=result)
-                                self.move_alpha_from_to(alpha=running_alphas[i],
+                                self.move_alpha_from_to(alpha=alphas[i],
                                                         total_result=result,
                                                         collection_old=self.collection_purgatory,
                                                         collection_new=self.collection_prod,
@@ -176,7 +176,7 @@ class alpha_client():
                                                         inverse=inverse)
                             elif (result['Fitness'] > 1.1) & (result['Sharpe'] > 1.25):
                                 inverse = False
-                                self.move_alpha_from_to(alpha=running_alphas[i],
+                                self.move_alpha_from_to(alpha=alphas[i],
                                                         total_result=result,
                                                         collection_old=self.collection_purgatory,
                                                         collection_new=self.collection_prod,
@@ -205,7 +205,7 @@ class alpha_client():
                             sleep_attempts = 0
                             time.sleep(self.pause)
                             #  Case when alpha is not proceeded for a long period of time
-                        elif stats['error'] == '' & stats['status'] == True:
+                        elif ((stats['error'] == '') & (stats['status'] == True)):
                             msg = 'Alpha {} not finished simulation'.format(alphas[i]['Code'])
                             self.logger.log_print(msg, function_name='AlphaParse')
 
@@ -224,7 +224,7 @@ class alpha_client():
                             time.sleep(self.pause)
 
                     except Exception as e:
-                        msg = 'Parse exception occured {e}'.format(e)
+                        msg = 'Parse exception occured {}'.format(e)
                         self.logger.log_print(msg, function_name='AlphaParse')
                         parse_attempts += 1
                         if (parse_attempts > 3):

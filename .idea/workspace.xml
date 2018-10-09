@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="75561075-4cf9-4976-a60d-3fa87232fc6b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/alpha_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/logger.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/workflow.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -49,8 +47,8 @@
       <file leaf-file-name="alpha_client.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/alpha_client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="322">
-              <caret line="200" column="53" selection-start-line="200" selection-start-column="44" selection-end-line="200" selection-end-column="53" />
+            <state relative-caret-position="271">
+              <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -443,8 +441,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/alpha_client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="200" column="53" selection-start-line="200" selection-start-column="44" selection-end-line="200" selection-end-column="53" />
+        <state relative-caret-position="271">
+          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
