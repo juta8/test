@@ -1,12 +1,13 @@
 import pymongo
 import time
+from datetime import datetime, timedelta
 
 class Logger():
-    def __init__(self, connection_string):
+    def __init__(self, mongo_connection_string):
         # self.connection_string = 'mongodb://juta_8:kloppolk_2018@ds119110.mlab.com:19110/wq'
         # self.connection_string = 'mongodb://dalisa1212:kloppolk_2017@wqserver-shard-00-00-ftqza.mongodb.net:27017,wqserver-shard-00-01-ftqza.mongodb.net:27017,wqserver-shard-00-02-ftqza.mongodb.net:27017/wq?ssl=true&replicaSet=WQServer-shard-0&authSource=admin&retryWrites=true'
 
-        self.connection_string = connection_string
+        self.connection_string = mongo_connection_string
         self.mongo = pymongo.MongoClient(mongo_connection_string).wq
         self.mongo_log = 'log'
 

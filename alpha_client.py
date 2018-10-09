@@ -183,8 +183,8 @@ class alpha_client():
                                                         collection_simulate=self.collection_simulate,
                                                         inverse=inverse)
 
-                                alpha_id = json.loads(self.alpha_parser.get_alphaid(cookie, alphas[i]['Index']).content)['result']['clientAlphaId']
-                                submission_id = json.loads(self.get_submissionid(cookie, alpha_id).content)['result']['RequestId']
+                                alpha_id = json.loads(self.requestor.get_alphaid(cookie, alphas[i]['Index']).content)['result']['clientAlphaId']
+                                submission_id = json.loads(self.requestor.get_submissionid(cookie, alpha_id).content)['result']['RequestId']
                                 self.mongo[self.collection_prod].update({'Index': alphas[i]['Index']},
                                                                         {"$set", {"AlphaId": alpha_id,
                                                                                   "SubmissionId": submission_id,
