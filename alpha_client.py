@@ -153,7 +153,7 @@ class alpha_client():
                     print('Parsing alpha {}'.format(alphas[i]['Code']))
                     stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
                                                                   index=alphas[i]['Index']).content)
-                    print(stats)
+
                     try:
                         if (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
                             result = stats['result'][-1]
@@ -185,11 +185,13 @@ class alpha_client():
                                                         inverse=inverse)
 
                                 alpha_id = json.loads(self.requestor.get_alphaid(cookie, alphas[i]['Index']).content)['result']['clientAlphaId']
+                                print('AlphaId {}'.format(alpha_id))
                                 submission_id = json.loads(self.requestor.get_submissionid(cookie, alpha_id).content)['result']['RequestId']
+                                print('SubmissionId {}'.format(submission_id))
                                 self.mongo[self.collection_prod].update({'Index': alphas[i]['Index']},
                                                                         {"$set": {"AlphaId": alpha_id,
                                                                                   "SubmissionId": submission_id,
-                                                                                  "SubmissionStatus": "InProgress"}})
+                                                                          "SubmissionStatus": "InProgress"}})
 
                             elif (result['Fitness'] < - 1.1) & (result['Sharpe'] < -1.25):
                                 self.mongo[self.collection_simulate].update({'Code': alphas[i]['Code']},
@@ -212,8 +214,8 @@ class alpha_client():
 
                             sleep_attempts += 1
                             time.sleep(3 * sleep_attempts)
-                            print(sleep_attempts)
-                            if sleep_attempts > 4:
+
+                            if sleep_attempts > 2:
                                 self.mongo[self.collection_purgatory].update({'Index': alphas[i]['Index']},
                                                                              {"$set": {"Comment": "Stats parsing timeout",
                                                                                       "Status": "Asleep"}})
