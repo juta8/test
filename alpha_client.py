@@ -55,7 +55,7 @@ class alpha_client():
 
         if inverse:
             self.mongo[collection_new].update({'Index': alpha['Index']}, {
-                "$set": {'Code': '-{}'.format(alpha['Index'])}})
+                "$set": {'Code': '-{}'.format(alpha['Code'])}})
 
         self.mongo[collection_old].remove({'Index': alpha['Index']})
 
