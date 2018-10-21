@@ -59,7 +59,7 @@ class Request():
         return response
 
     def build_cookie(self, cookie):
-        result = 'django_language={}; _xsrf={}; WSSID={}; UID={}; _gat={}; _gat_wsdevTracker={}'.format('en', self.xsrf,
+        result = 'django_language={}; _xsrf={}; WSSID={}; UID={}; WQCookieConsent=accepted; _gat={}; _gat_wsdevTracker={}'.format('en', self.xsrf,
                                                                                                         cookie.get_dict()[
                                                                                                             'WSSID'],
                                                                                                         cookie.get_dict()[
@@ -78,6 +78,34 @@ class Request():
             sumilate_url,
             data={
                 'args': alpha,
+                '_xsrf': self.xsrf,
+            },
+            headers={
+                'accept': 'application/json',
+                'cache-control': 'max-age=0',
+                'Origin': origin,
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36',
+                'content-type': 'application/x-www-form-urlencoded',
+                'Referer': referer,
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Cookie': self.build_cookie(cookie)
+            },
+            proxies=self.proxies
+        )
+        return response
+
+    def progress_alpha(self, cookie, index, referer=None, origin=None):
+        if referer is None:
+            referer = '{}/simulate'.format(self.site_address)
+
+        if origin is None:
+            origin = '{}'.format(self.site_address)
+
+        stats_url = '{}/job/progress/{}'.format(self.site_address, index)
+        response = requests.post(
+            stats_url,
+            data={
                 '_xsrf': self.xsrf,
             },
             headers={

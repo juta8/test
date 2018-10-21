@@ -277,7 +277,7 @@ class alpha_client():
                         error_attempts = 0
                         i += 1
                     else:
-                        if res['result']['InProgress'] == True:
+                        if result['result']['InProgress'] == True:
                             sleep_attempts += 1
                             time.sleep(5 * sleep_attempts)
                             if (sleep_attempts > 5):

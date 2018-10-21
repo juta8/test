@@ -6,11 +6,13 @@ import time
 class AlphaParser():
     def build_alpha(self, code, delay="1", univid="TOP3000", region="USA", opneut="subindustry", decay="5",
                     optrunc="0.1", opassetclass="EQUITY", opcodetype="EXPRESSION", unitcheck="off", tags="equity",
-                    DataViz="false", backdays=512, simtime="Y5"):
+                    DataViz="0", backdays=512, simtime="Y10", nanhandling="on", pasteurize="on"):
         alpha_list = []
         alpha_dict = {}
+        alpha_dict["nanhandling"] = "{}".format(nanhandling)
         alpha_dict["delay"] = "{}".format(delay)
         alpha_dict["unitcheck"] = "{}".format(unitcheck)
+        alpha_dict["pasteurize"] = "{}".format(pasteurize)
         alpha_dict["univid"] = "{}".format(univid)
         alpha_dict["opcodetype"] = "{}".format(opcodetype)
         alpha_dict["opassetclass"] = "{}".format(opassetclass)
@@ -18,9 +20,10 @@ class AlphaParser():
         alpha_dict["code"] = "{}".format(code)
         alpha_dict["region"] = "{}".format(region)
         alpha_dict["opneut"] = "{}".format(opneut)
+        alpha_dict["IntradayType"] = None
         alpha_dict["tags"] = "{}".format(tags)
         alpha_dict["decay"] = "{}".format(decay)
-        alpha_dict["DataViz"] = "{}".format(DataViz)
+        alpha_dict["dataviz"] = "{}".format(DataViz)
         alpha_dict["backdays"] = "{}".format(backdays)
         alpha_dict["simtime"] = "{}".format(simtime)
         alpha_list.append(alpha_dict)
