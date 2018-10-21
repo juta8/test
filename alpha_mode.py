@@ -118,8 +118,8 @@ class AlphaMode:
                 time.sleep(5)
                 submission = self.requestor.get_submission_result(cookie=cookie, submissionid=submission_id)
                 result = json.loads(submission.content)
-                if (result['result'] == None):
-                    alpha_success_submit=True
+                if result['result']==None:
+                    alpha_success_submit = True
                 submit_attempts += 1
 
         if is_logout:

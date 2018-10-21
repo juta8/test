@@ -15,7 +15,7 @@
       "beg_time": "",
       "end_time": "",
       "days off": "",
-      "proxies": {}
+      "proxies": {"http": "http://bbfvti:aG0bT05OOV@185.139.215.186:24531"}
     },
     {
       "name": "da",
@@ -43,7 +43,7 @@
       "beg_time": "",
       "end_time": "",
       "days_off": "",
-      "proxies": {"http":"http://ppohxc:OROarUUmzT@78.40.118.31:24531"}
+      "proxies": {"http":"http://bbfvti:aG0bT05OOV@185.250.151.148:24531"}
     }
   ]
 }
