@@ -1,5 +1,6 @@
 import requests
 import alpha_parser
+import alpha_client
 import alpha_requestor
 import logger
 import pymongo
@@ -11,6 +12,7 @@ from bson.objectid import ObjectId
 class AlphaMode:
     def __init__(self, user_name):
         self.user_name = user_name
+        config_fn = "config.json"
         with open(config_fn, 'r') as f:
             config = json.load(f)
         self.mongo_connection_string = config['mongodb_connection_string']
@@ -21,41 +23,41 @@ class AlphaMode:
         self.collection_trash = 'alphas_trash'
         self.collection_simulate = 'alphas_simulate'
         self.collection_prod = 'alphas_prod'
-        self.login = info[0]['login']
-        self.password = info[0]['password']
-        self.xsrf = info[0]['xsrf']
-        self.proxies = info[0]['proxies']
+        self.login = self.info[0]['login']
+        self.password = self.info[0]['password']
+        self.xsrf = self.info[0]['xsrf']
+        self.proxies = self.info[0]['proxies']
 
-        self.client = alpha_client.alpha_client(login=login,
-           password=password,
-           collection_prod=collection_prod,
-           collection_simulate=collection_simulate,
-           collection_trash=collection_trash,
-           collection_purgatory=collection_purgatory,
-           mongo_connection_string=mongo_connection_string,
-           origin=origin,
-           xsrf=xsrf,
-           site_address=site_address,
-           proxies=proxies)
+        self.client = alpha_client.alpha_client(login=self.login,
+           password=self.password,
+           collection_prod=self.collection_prod,
+           collection_simulate=self.collection_simulate,
+           collection_trash=self.collection_trash,
+           collection_purgatory=self.collection_purgatory,
+           mongo_connection_string=self.mongo_connection_string,
+           origin=self.origin,
+           xsrf=self.xsrf,
+           site_address=self.site_address,
+           proxies=self.proxies)
 
-        self.requestor = alpha_requestor.Request(login=login,
-            password=password,
-            origin=origin,
-            xsrf=xsrf,
-            site_address=site_address,
-            proxies=proxies)
+        self.requestor = alpha_requestor.Request(login=self.login,
+            password=self.password,
+            origin=self.origin,
+            xsrf=self.xsrf,
+            site_address=self.site_address,
+            proxies=self.proxies)
 
 
     def simulate_base_pack(self, pack_number=500):
         cookie = self.requestor.log_in().cookies
         # ALPHAS PACK SIMULATION
         try:
-            mongo = pymongo.MongoClient(mongo_connection_string).wq
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_simulate'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
             ids = list(alphas['_id'])
         except:
-            mongo = pymongo.MongoClient(mongo_connection_string).wq
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_simulate'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
             ids = list(alphas['_id'])
@@ -63,12 +65,12 @@ class AlphaMode:
 
         # ALPHAS PACK PARSING
         try:
-            mongo = pymongo.MongoClient(mongo_connection_string).wq
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_purgatory'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
             ids = list(alphas['_id'])
         except:
-            mongo = pymongo.MongoClient(mongo_connection_string).wq
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_purgatory'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
             ids = list(alphas['_id'])
@@ -76,16 +78,16 @@ class AlphaMode:
 
         # APLHAS PACK SUBMISSION
         try:
-            mongo = pymongo.MongoClient(mongo_connection_string).wq
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(list(mongo['alphas_prod'].find({'Status': 'InProgress',
                                                                   'Executor': 'da',
                                                                   'SubmissionId':
                                                                       {"$gte": 0}}).limit(pack_number)))
             ids = list(alphas['_id'])
         except:
-            mongo = pymongo.MongoClient(mongo_connection_string).wq
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(list(mongo['alphas_prod'].find(
-                {'Status': 'InProgress', 'Executor': 'da', "SubmissionId": {"$gte": 0}}).limit(pack_number)))
+                {'Status': 'InProgress', 'Executor': self.user_name, "SubmissionId": {"$gte": 0}}).limit(pack_number)))
             ids = list(alphas['_id'])
         self.client.parse_submissions(cookie, ids)
 

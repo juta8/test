@@ -6,7 +6,7 @@
     {
       "name": "nk",
       "login": "krokhmal11@mail.ru",
-      "password": "cop12345",
+      "password": "cop_12345",
       "xsrf": "2|0d88a38b|11fba3b3de4b36710dcc7b5e9e1b53c1|1534426416",
       "db_base": "alphas_base_nk",
       "db_simulate": "alphas_simulate_nk",
@@ -21,7 +21,7 @@
       "name": "da",
       "login": "dalisa1212@mail.ru",
       "xsrf": "2|fb38ac16|5d2254a56b5d9fe3cbbeeace215a55ef|1529707760",
-      "password": "playhard1212",
+      "password": "playhard_1212",
       "db_base": "alphas_base_da",
       "db_simulate": "alphas_simulate_da",
       "db_trash": "alphas_trash_da",
@@ -34,7 +34,7 @@
     {
       "name": "mg",
       "login": "nikita95borisov@mail.ru",
-      "password": "вконтактедобропожаловать",
+      "password": "вконтактедобропожаловать1994",
       "xsrf": "2|0aaabecb|5053f6e633c94aaebbd44a577c19985b|1530485282",
       "db_base": "alphas_base_mg",
       "db_simulate": "alphas_simulate_mg",
@@ -43,7 +43,7 @@
       "beg_time": "",
       "end_time": "",
       "days_off": "",
-      "proxies": {"http":"http://bbfvti:aG0bT05OOV@185.250.151.148:24531"}
+      "proxies": {}
     }
   ]
 }

@@ -49,6 +49,7 @@ if __name__ == '__main__':
         fmt = UnseenFormatter()
         logic_name = sys.argv[1]
         logic_info = pd.DataFrame(list(db['logic'].find({'Name': logic_name})))
+        db['logic'].update({'Name': logic_name}, {"$set": {'Status': 'Finished'}})
 
         if (logic_info.shape[0] > 0):
             alpha_params = logic_info['Params'].iloc[0]
@@ -60,7 +61,7 @@ if __name__ == '__main__':
             relationship_subsets = findsubsets(relationship, len(alpha_params))
 
             for region in [data['region']['USA']]:
-                for universe in [data['universe']['TOP3000'], data['universe']['TOP1000']]:
+                for universe in [data['universe']['TOP200'], data['universe']['TOP500']]:
                     for neutr in [data['neutralization']['market'], data['neutralization']['subindustry'], data['neutralization']['industry']]:
                         print('Creating fundamental alphas')
                         for subset in fundamental_subsets:
