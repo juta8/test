@@ -424,7 +424,8 @@
         "TOP2000": "TOP2000",
         "TOP1000": "TOP1000",
         "TOP500": "TOP500",
-        "TOP200": "TOP200"
+        "TOP200": "TOP200",
+        "TOP100": "TOP100"
     },
     "neutralization":
     {

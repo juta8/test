@@ -55,12 +55,18 @@ class AlphaMode:
             mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_simulate'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
-            ids = list(alphas['_id'])
+            if (len(alphas) != 0):
+                ids = list(alphas['_id'])
+            else:
+                ids = []
         except:
             mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_simulate'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
-            ids = list(alphas['_id'])
+            if (len(alphas) != 0):
+                ids = list(alphas['_id'])
+            else:
+                ids = []
         self.client.simulate_alphas(cookie, ids)
 
         # ALPHAS PACK PARSING
@@ -68,13 +74,19 @@ class AlphaMode:
             mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_purgatory'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
-            ids = list(alphas['_id'])
+            if (len(alphas) != 0):
+                ids = list(alphas['_id'])
+            else:
+                ids = []
         except:
             mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_purgatory'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
             ids = list(alphas['_id'])
-        self.client.parse_alphas(cookie, ids)
+        if (len(alphas) != 0):
+            ids = list(alphas['_id'])
+        else:
+            ids = []
 
         # APLHAS PACK SUBMISSION
         try:
@@ -83,38 +95,47 @@ class AlphaMode:
                                                                   'Executor': 'da',
                                                                   'SubmissionId':
                                                                       {"$gte": 0}}).limit(pack_number)))
-            ids = list(alphas['_id'])
+            if (len(alphas) != 0):
+                ids = list(alphas['_id'])
+            else:
+                ids = []
         except:
             mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(list(mongo['alphas_prod'].find(
                 {'Status': 'InProgress', 'Executor': self.user_name, "SubmissionId": {"$gte": 0}}).limit(pack_number)))
-            ids = list(alphas['_id'])
+            if (len(alphas) != 0):
+                ids = list(alphas['_id'])
+            else:
+                ids = []
         self.client.parse_submissions(cookie, ids)
 
         self.requestor.log_out(cookie)
 
-    def simulate_(self, alpha, cookie, is_login=False, is_logout=False):
+    def simulate(self, alpha, cookie, is_login=False, is_logout=False):
         alpha_success_submit=False
         if is_login:
             cookie = self.requestor.log_in().cookies
 
         simulate_response = json.loads(self.requestor.simulate_alpha(cookie=cookie, alpha=alpha).content)
-        if response['error'] == None:
+
+        if simulate_response['error'] == None:
             alpha_index = simulate_response['result'][0]
 
         simulate_attempts = 0
         simulate_result = False
-        while simulate_attempts < 20:
+        while simulate_attempts < 30:
             time.sleep(5)
-            if self.requestor.progress_alpha(cookie, alpha_index) == '"DONE"':
+            progress =  self.requestor.progress_alpha(cookie, alpha_index).content.decode('utf8')
+            print(progress, simulate_attempts)
+            if progress == '"DONE"':
                 simulate_result = True
                 break
             simulate_attempts += 1
 
         if simulate_result:
-            alpha_id = json.loads(self.requestor.get_alphaid(cookie= cookie, index=index).content)['result'][
+            alpha_id = json.loads(self.requestor.get_alphaid(cookie= cookie, index=alpha_index).content)['result'][
                 'clientAlphaId']
-            submission_id = json.loads(self.requestor.get_submissionid(cookie=cookie, alpha_index=alpha_id).content)['result']['RequestId']
+            submission_id = json.loads(self.requestor.get_submissionid(cookie=cookie, alphaid=alpha_id).content)['result']['RequestId']
             submit_attempts = 0
             while submit_attempts < 20:
                 time.sleep(5)

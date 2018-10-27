@@ -68,6 +68,7 @@ class alpha_client():
         return total_result
 
     def simulate_alphas(self, cookie, ids):
+        print("Function simulating alphas started")
         i = 0
         error_attempts = 0
         run_attempts = 0
@@ -82,6 +83,9 @@ class alpha_client():
 
                     response = json.loads(self.requestor.simulate_alpha(cookie=cookie,
                                                                         alpha=alpha).content)
+                    # to do: delete
+                    print(response)
+
                     if response['error'] == None:
                         alpha_index = response['result'][0]
 
@@ -104,7 +108,7 @@ class alpha_client():
                     # To many alphas simulating error happen
                     elif response['error']['all'] == 'You have reached the limit of concurrent simulations. Please wait for the previous simulation(s) to finish.':
                         print('Too many alphas simulating')
-                        time.sleep(self.pause)
+                        time.sleep(self.pause * 6)
 
                     # Login error happen or site doesn't works
                     elif response['error'] == 'Expecting value: line 1 column 1 (char 0)':
@@ -136,8 +140,12 @@ class alpha_client():
             else:
                 print('Too many errors, function Simulate Alphas finished')
                 break
+        print("Function simulating alphas finished")
+        print("")
+        print("")
 
     def parse_alphas(self, cookie, ids, id_type=False):
+        print("Function parsing alphas started")
         if id_type:
             alphas = list(self.mongo[self.collection_purgatory].find({"AlphaId": {"$in": ids}}))
         else:
@@ -154,13 +162,23 @@ class alpha_client():
                     print('Parsing alpha {}'.format(alphas[i]['Code']))
                     stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
                                                                   index=alphas[i]['Index']).content)
+                    # to do: delete
+                    print(stats)
 
                     try:
-                        if (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
+                        if (stats['error'] == '') & (stats['result'] == None) & (stats['status'] == False):
+                            print("Deleting old alpha from purgatory {}".format(alphas[i]['Code']))
+                            self.mongo[self.collection_purgatory].remove({'Code' : alphas[i]['Code']}, multi=True)
+                            time.sleep(self.pause / 2)
+                            i += 1
+
+                        elif (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
                             result = stats['result'][-1]
                             if abs(result['Fitness']) < 0.35:
-                                self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']})
-                                self.mongo[self.collection_simulate].remove({'Code': alphas[i]['Code']})
+                                self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
+                                self.mongo[self.collection_simulate].remove({'Code': alphas[i]['Code']}, multi=True)
+                                time.sleep(self.pause / 2)
+
                             elif abs(result['Fitness']) < 0.9:
                                 inverse = result['Fitness'] < 0
                                 result = self.alpha_stats_abs(total_result=result)
@@ -252,10 +270,16 @@ class alpha_client():
             else:
                 msg = 'Too many errors, function Parse_Alphas finished'
                 self.logger.log_print(msg, function_name='AlphaParse')
+                print("Function parsing alphas finished")
                 break
+
+        print("Function parsing alphas finished")
+        print("")
+        print("")
 
     def parse_submissions(self, cookie, ids, ids_type = False):
         try:
+            print("Function parse submissions started")
             if ids_type:
                 alphas = list(self.mongo[self.collection_prod].find({"AlphaId": {"$in": ids}}))
             else:
@@ -272,10 +296,15 @@ class alpha_client():
                         submission = self.requestor.get_submission_result(cookie, alphas[i]['SubmissionId'])
                         result = json.loads(submission.content)
                         print(result)
-                        if result['result'] == None:
+                        if result['status'] == False:
+                            print('Alpha too old for submission')
                             self.mongo[self.collection_prod].update({'Index': alphas[i]['Index']},
-                                                                    {"$set": {"Submission": res['status'],
-                                                                              "SubmissionInfo": res['error'],
+                                                                    {"$set": {"SubmissionStatus": 'OldInProgress'}})
+                            i += 1
+                        elif result['result'] == None:
+                            self.mongo[self.collection_prod].update({'Index': alphas[i]['Index']},
+                                                                    {"$set": {"Submission": result['status'],
+                                                                              "SubmissionInfo": result['error'],
                                                                               "SubmissionStatus": 'Finished'}})
 
                             sleep_attempts = 0
@@ -303,5 +332,6 @@ class alpha_client():
                     msg = 'Too many errors, function Parse_Submission finished'
                     self.logger.log_print(msg, function_name='AlphaParse')
                     break
-        except:
-            print('Next')
+            print("Function parse submissions finished")
+        except Exception as e:
+            print("Function parse submissions finished with critical error {e}".format(e))
