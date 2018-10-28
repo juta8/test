@@ -82,11 +82,12 @@ class AlphaMode:
             mongo = pymongo.MongoClient(self.mongo_connection_string).wq
             alphas = pd.DataFrame(
                 list(mongo['alphas_purgatory'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
-            ids = list(alphas['_id'])
-        if (len(alphas) != 0):
-            ids = list(alphas['_id'])
-        else:
-            ids = []
+            if (len(alphas) != 0):
+                ids = list(alphas['_id'])
+            else:
+                ids = []
+
+        self.client.parse_alphas(cookie, ids)
 
         # APLHAS PACK SUBMISSION
         try:
@@ -109,6 +110,28 @@ class AlphaMode:
                 ids = []
         self.client.parse_submissions(cookie, ids)
 
+        self.requestor.log_out(cookie)
+
+    def parse_pack(self, pack_number=500):
+        cookie = self.requestor.log_in().cookies
+        # ALPHAS PACK SIMULATION
+        try:
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+            alphas = pd.DataFrame(
+                list(mongo['alphas_purgatory'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
+            if (len(alphas) != 0):
+                ids = list(alphas['_id'])
+            else:
+                ids = []
+        except:
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+            alphas = pd.DataFrame(
+                list(mongo['alphas_purgatory'].find({'Status': 'InProgress', 'Executor': self.user_name}).limit(pack_number)))
+            if (len(alphas) != 0):
+                ids = list(alphas['_id'])
+            else:
+                ids = []
+        self.client.parse_alphas(cookie, ids)
         self.requestor.log_out(cookie)
 
     def simulate(self, alpha, cookie, is_login=False, is_logout=False):

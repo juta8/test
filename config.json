@@ -34,7 +34,7 @@
     {
       "name": "mg",
       "login": "nikita95borisov@mail.ru",
-      "password": "вконтактедобропожаловать1994",
+      "password": "vk_welcome1995",
       "xsrf": "2|0aaabecb|5053f6e633c94aaebbd44a577c19985b|1530485282",
       "db_base": "alphas_base_mg",
       "db_simulate": "alphas_simulate_mg",
@@ -43,7 +43,7 @@
       "beg_time": "",
       "end_time": "",
       "days_off": "",
-      "proxies": {}
+      "proxies": {"http":"http://bbfvti:aG0bT05OOV@185.250.151.148:24531"}
     }
   ]
 }

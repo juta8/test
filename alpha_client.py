@@ -83,8 +83,6 @@ class alpha_client():
 
                     response = json.loads(self.requestor.simulate_alpha(cookie=cookie,
                                                                         alpha=alpha).content)
-                    # to do: delete
-                    print(response)
 
                     if response['error'] == None:
                         alpha_index = response['result'][0]
@@ -162,9 +160,7 @@ class alpha_client():
                     print('Parsing alpha {}'.format(alphas[i]['Code']))
                     stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
                                                                   index=alphas[i]['Index']).content)
-                    # to do: delete
                     print(stats)
-
                     try:
                         if (stats['error'] == '') & (stats['result'] == None) & (stats['status'] == False):
                             print("Deleting old alpha from purgatory {}".format(alphas[i]['Code']))
@@ -232,20 +228,22 @@ class alpha_client():
                             #  Case when alpha is not proceeded for a long period of time
                         elif ((stats['error'] == '') & (stats['status'] == True)):
                             msg = 'Alpha {} not finished simulation'.format(alphas[i]['Code'])
+                            status = self.requestor.progress_alpha(cookie, alphas[i]['Index'])
+                            print('Alpha status {}'.format(status.content))
                             self.logger.log_print(msg, function_name='AlphaParse')
 
                             sleep_attempts += 1
                             time.sleep(3 * sleep_attempts)
 
                             if sleep_attempts > 2:
-                                self.mongo[self.collection_purgatory].update({'Index': alphas[i]['Index']},
-                                                                             {"$set": {"Comment": "Stats parsing timeout",
-                                                                                      "Status": "Asleep"}})
+                                print('Deleting alpha {} from purgatory'.format(alphas[i]['Code']) )
+                                self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
                                 sleep_attempts = 0
                                 i += 1
 
                         else:
                             msg = 'Not proceeded error {}'.format(stats['error'])
+                            self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
                             self.logger.log_print(msg, function_name='AlphaParse')
                             error_attempts += 1
                             time.sleep(self.pause)
