@@ -3,14 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="75561075-4cf9-4976-a60d-3fa87232fc6b" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ipynb_checkpoints/workflow-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/.ipynb_checkpoints/workflow-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alpha_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alpha_creator.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_creator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/alpha_mode.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_mode.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alpha_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data.json" beforeDir="false" afterPath="$PROJECT_DIR$/data.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logic.txt" beforeDir="false" afterPath="$PROJECT_DIR$/logic.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow.ipynb" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -139,8 +132,8 @@
       <file leaf-file-name="alpha_mode.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/alpha_mode.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="691">
-              <caret line="269" column="92" lean-forward="true" selection-start-line="269" selection-start-column="92" selection-end-line="269" selection-end-column="92" />
+            <state relative-caret-position="317">
+              <caret line="280" lean-forward="true" selection-start-line="280" selection-end-line="280" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -624,8 +617,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/alpha_mode.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="691">
-          <caret line="269" column="92" lean-forward="true" selection-start-line="269" selection-start-column="92" selection-end-line="269" selection-end-column="92" />
+        <state relative-caret-position="317">
+          <caret line="280" lean-forward="true" selection-start-line="280" selection-end-line="280" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>

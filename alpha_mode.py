@@ -176,8 +176,8 @@ class AlphaMode:
 
         return alpha_success_submit
 
-    def touch_mode(self, cookie, iteration=1, pack_number=40, trash_iteration=12):
-        # cookie = self.requestor.log_in().cookies
+    def touch_mode(self, iteration=1, pack_number=40, trash_iteration=12):
+        cookie = self.requestor.log_in().cookies
 
         # ALPHAS PACK SIMULATION FOR UPDATE
         mongo = pymongo.MongoClient(self.mongo_connection_string).wq
@@ -277,7 +277,7 @@ class AlphaMode:
 
 
 
-        # self.requestor.log_out(cookie)
+        self.requestor.log_out(cookie)
 
 
 
