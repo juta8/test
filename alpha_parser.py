@@ -30,7 +30,7 @@ class AlphaParser():
         return json.dumps(alpha_list)
 
     def report_alpha(self, alpha, alpha_code, alpha_executor, alpha_type, logic_name, region, universe, neutr, delay=1,
-                     type='Base0'):
+                     status="InProgress",type='Base0', iteration=0):
         alpha_dict = {}
         alpha_dict['Alpha'] = alpha
         alpha_dict['Code'] = alpha_code
@@ -42,9 +42,10 @@ class AlphaParser():
         alpha_dict['Executor'] = alpha_executor
         alpha_dict['LogicName'] = logic_name
         alpha_dict['Comment'] = ''
-        alpha_dict['Status'] = 'InProgress'
+        alpha_dict['Status'] = status
         alpha_dict['Type'] = type
         alpha_dict['DataType'] = alpha_type
+        alpha_dict['Iteration'] = iteration
         return alpha_dict
 
     def simulating_alpha(self, alpha, build_response, alphas_iteration):

@@ -1,35 +1,14 @@
-LOGIC
+1 Режим (Генерация базы). (InProgress)
+	Добавляем в alphas_simulate простенькие альфы со статусом InProgress
+	Более-менее неплохие попадают в Prod, неочень - в Trash
 
-(x > delay(x, 126)) ? 1 : -1
-(x/y > delay(x/y, 126)) ? 1 : -1
-Arcsin(x / delay(x, 126))
-Arcsin(x/y / delay(x/y, 126))	
-Arccos(x / delay(x, 126))
-Arccos(x/y / delay(x/y, 126))
-Correlation(x, delay(y, 100), 100) * delta(y, 100) 
-Correlation(x, delay(y, 100), 100) * delta(y, 100) / y
-StdDev(x/y, 126)
-Ts_Kurtosis(x/y, 126)
-Ts_Moment(x/y, 3, 126)
-Ts_Skewness(x/y, 126)
-Ts_ZScore(x/y, 126)
+2 Режим (Режим тухачевского) (InTuch)
+	Берем альфу из prod, размешиваем ее вместе с 12 из Trash, добавляем в alphas_simulate со статусом InTuch.
+	Симулируем ее, после смотрим в Prod(из Trash все удаляем) и выбираем только одну самую лучшую по Sharpe.
+	C новой альфой повторяем процедуру.
 
-rank((x+y)/z)
-rank(x/(y+z))
-rank(x/(y-x))
-rank((x+y)/(z + t))
+3 Режим (Режим турнира) (InTour)
+	Берем альфы из prod, сортируем их по Sharpe и начинаем турнирно строить мега альфу точно так же с итерациями
 
-
-
-IDEAS WITH ALPHAS
-groupcount(pasteurize(alpha),market)>100?alpha:nan
-
-
-
-ToDo:
-alphas working time estimation (research)
-email sender
-
-
-
-
+4 Режим (Режим смеси)
+	Генерируем случайную величину и смешиваем все подряд уже хорошее с помощью нее. 	

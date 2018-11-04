@@ -1,6 +1,7 @@
 import requests
 import alpha_parser
 import alpha_requestor
+import utils
 import logger
 import pymongo
 import time
@@ -37,8 +38,18 @@ class alpha_client():
         self.simulation_sleep = 0.5
         self.pause = 2
 
+
+    def is_number(self, s):
+        try:
+            int(s)
+            return True
+        except ValueError:
+            return False
+
     # Usual usage: move alpha from purgatory to prod or trash
-    def move_alpha_from_to(self, alpha, total_result, collection_old, collection_new, collection_simulate, inverse=False):
+    def move_alpha_from_to(self, alpha, total_result, collection_old,
+                           collection_new, collection_simulate, inverse=False,
+                           is_tuch=true, is_tour=true, is_mix=true):
         self.mongo[collection_simulate].update({'Code': alpha['Code']}, {"$set": {'Status': 'Finished'}})
         alpha_curr = list(self.mongo[collection_old].find({'Index': int(alpha['Index'])}))
 
@@ -49,6 +60,9 @@ class alpha_client():
 
         alpha_curr = alpha_curr[0]
         alpha_curr = {k: v for k, v in alpha_curr.items() if k not in ['_id']}
+        alpha_curr['IsTuch'] = is_tuch
+        alpha_curr['IsTour'] = is_tour
+        alpha_curr['IsMix'] = is_mix
 
         self.mongo[collection_new].insert(alpha_curr)
         self.mongo[collection_new].update({'Index': alpha['Index']}, {"$set": total_result})
@@ -142,7 +156,8 @@ class alpha_client():
         print("")
         print("")
 
-    def parse_alphas(self, cookie, ids, id_type=False):
+    def parse_alphas(self, cookie, ids, id_type=False,
+                     submit=True, is_tuch=True, is_tour=True, is_mix=True):
         print("Function parsing alphas started")
         if id_type:
             alphas = list(self.mongo[self.collection_purgatory].find({"AlphaId": {"$in": ids}}))
@@ -158,105 +173,127 @@ class alpha_client():
             if error_attempts < self.max_error_attempts:
                 try:
                     print('Parsing alpha {}'.format(alphas[i]['Code']))
-                    stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
-                                                                  index=alphas[i]['Index']).content)
-                    print(stats)
-                    try:
-                        if (stats['error'] == '') & (stats['result'] == None) & (stats['status'] == False):
-                            print("Deleting old alpha from purgatory {}".format(alphas[i]['Code']))
-                            self.mongo[self.collection_purgatory].remove({'Code' : alphas[i]['Code']}, multi=True)
-                            time.sleep(self.pause / 2)
-                            i += 1
 
-                        elif (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
-                            result = stats['result'][-1]
-                            if abs(result['Fitness']) < 0.35:
-                                self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
-                                self.mongo[self.collection_simulate].remove({'Code': alphas[i]['Code']}, multi=True)
+                    status = self.requestor.progress_alpha(cookie, alphas[i]['Index'])
+                    status_content = status.content
+                    print(status_content)
+                    if ((status_content.decode('utf-8') == '"DONE"') | (status_content.decode('utf-8') == "DONE")):
+                        stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
+                                                                      index=alphas[i]['Index']).content)
+                        print(stats)
+                        try:
+                            if (stats['error'] == '') & (stats['result'] == None) & (stats['status'] == False):
+                                print("Deleting old alpha from purgatory {}".format(alphas[i]['Code']))
+                                self.mongo[self.collection_purgatory].remove({'Code' : alphas[i]['Code']}, multi=True)
                                 time.sleep(self.pause / 2)
+                                i += 1
 
-                            elif abs(result['Fitness']) < 0.9:
-                                inverse = result['Fitness'] < 0
-                                result = self.alpha_stats_abs(total_result=result)
-                                self.move_alpha_from_to(alpha=alphas[i],
-                                                        total_result=result,
-                                                        collection_old=self.collection_purgatory,
-                                                        collection_new=self.collection_trash,
-                                                        collection_simulate=self.collection_simulate,
-                                                        inverse=inverse)
-                            elif (abs(result['Fitness']) < 1.1) | (abs(result['Sharpe']) < 1.25):
-                                inverse = result['Fitness'] < 0
-                                result = self.alpha_stats_abs(total_result=result)
-                                self.move_alpha_from_to(alpha=alphas[i],
-                                                        total_result=result,
-                                                        collection_old=self.collection_purgatory,
-                                                        collection_new=self.collection_prod,
-                                                        collection_simulate=self.collection_simulate,
-                                                        inverse=inverse)
-                            elif (result['Fitness'] > 1.1) & (result['Sharpe'] > 1.25):
-                                inverse = False
-                                self.move_alpha_from_to(alpha=alphas[i],
-                                                        total_result=result,
-                                                        collection_old=self.collection_purgatory,
-                                                        collection_new=self.collection_prod,
-                                                        collection_simulate=self.collection_simulate,
-                                                        inverse=inverse)
+                            elif (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
+                                result = stats['result'][-1]
+                                if abs(result['Fitness']) < 0.35:
+                                    self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
+                                    self.mongo[self.collection_simulate].remove({'Code': alphas[i]['Code']}, multi=True)
+                                    time.sleep(self.pause / 2)
 
-                                alpha_id = json.loads(self.requestor.get_alphaid(cookie, alphas[i]['Index']).content)['result']['clientAlphaId']
-                                print('AlphaId {}'.format(alpha_id))
-                                submission_id = json.loads(self.requestor.get_submissionid(cookie, alpha_id).content)['result']['RequestId']
-                                print('SubmissionId {}'.format(submission_id))
-                                self.mongo[self.collection_prod].update({'Index': alphas[i]['Index']},
-                                                                        {"$set": {"AlphaId": alpha_id,
-                                                                                  "SubmissionId": submission_id,
-                                                                          "SubmissionStatus": "InProgress"}})
+                                elif abs(result['Fitness']) < 0.9:
+                                    inverse = result['Fitness'] < 0
+                                    result = self.alpha_stats_abs(total_result=result)
+                                    self.move_alpha_from_to(alpha=alphas[i],
+                                                            total_result=result,
+                                                            collection_old=self.collection_purgatory,
+                                                            collection_new=self.collection_trash,
+                                                            collection_simulate=self.collection_simulate,
+                                                            inverse=inverse,
+                                                            is_tuch=False,
+                                                            is_mix=False,
+                                                            is_tour=False)
+                                elif (abs(result['Fitness']) < 1.1) | (abs(result['Sharpe']) < 1.25):
+                                    inverse = result['Fitness'] < 0
+                                    result = self.alpha_stats_abs(total_result=result)
+                                    self.move_alpha_from_to(alpha=alphas[i],
+                                                            total_result=result,
+                                                            collection_old=self.collection_purgatory,
+                                                            collection_new=self.collection_prod,
+                                                            collection_simulate=self.collection_simulate,
+                                                            inverse=inverse,
+                                                            is_tuch=is_tuch,
+                                                            is_tour=is_tour,
+                                                            is_mix=is_mix)
+                                elif (result['Fitness'] > 1.1) & (result['Sharpe'] > 1.25):
+                                    inverse = False
+                                    self.move_alpha_from_to(alpha=alphas[i],
+                                                            total_result=result,
+                                                            collection_old=self.collection_purgatory,
+                                                            collection_new=self.collection_prod,
+                                                            collection_simulate=self.collection_simulate,
+                                                            inverse=inverse,
+                                                            is_tuch=is_tuch,
+                                                            is_tour=is_tour,
+                                                            is_mix=is_mix
+                                                            )
 
-                            elif (result['Fitness'] < - 1.1) & (result['Sharpe'] < -1.25):
-                                self.mongo[self.collection_simulate].update({'Code': alphas[i]['Code']},
-                                                                            {"$set": {"Code": "-{}".format(alphas[i]['Code']),
-                                                                                      "Status": "Urgently"}})
-                                self.mongo[self.collection_purgatory].remove({'Index': alphas[i]['Index']})
-                            else:
-                                msg = 'Not proceeded case with Fitness {} and Sharpe {}'.format(result['Fitness'],
-                                                                                                result['Sharpe'])
-                                self.logger.log_print(msg, function_name='AlphaParse')
+                                    if submit:
+                                        alpha_id = json.loads(self.requestor.get_alphaid(cookie, alphas[i]['Index']).content)['result']['clientAlphaId']
+                                        print('AlphaId {}'.format(alpha_id))
+                                        submission_id = json.loads(self.requestor.get_submissionid(cookie, alpha_id).content)['result']['RequestId']
+                                        print('SubmissionId {}'.format(submission_id))
+                                        self.mongo[self.collection_prod].update({'Index': alphas[i]['Index']},
+                                                                            {"$set": {"AlphaId": alpha_id,
+                                                                                      "SubmissionId": submission_id,
+                                                                              "SubmissionStatus": "InProgress"}})
 
-                            i += 1
-                            error_attempts = 0
-                            sleep_attempts = 0
-                            time.sleep(self.pause)
-                            #  Case when alpha is not proceeded for a long period of time
-                        elif ((stats['error'] == '') & (stats['status'] == True)):
-                            msg = 'Alpha {} not finished simulation'.format(alphas[i]['Code'])
-                            status = self.requestor.progress_alpha(cookie, alphas[i]['Index'])
-                            print('Alpha status {}'.format(status.content))
-                            self.logger.log_print(msg, function_name='AlphaParse')
+                                elif (result['Fitness'] < - 1.1) & (result['Sharpe'] < -1.25):
+                                    self.mongo[self.collection_simulate].update({'Code': alphas[i]['Code']},
+                                                                                {"$set": {"Code": "-{}".format(alphas[i]['Code']),
+                                                                                          "Status": "Urgently"}})
+                                    self.mongo[self.collection_purgatory].remove({'Index': alphas[i]['Index']})
+                                else:
+                                    msg = 'Not proceeded case with Fitness {} and Sharpe {}'.format(result['Fitness'],
+                                                                                                    result['Sharpe'])
+                                    self.logger.log_print(msg, function_name='AlphaParse')
 
-                            sleep_attempts += 1
-                            time.sleep(3 * sleep_attempts)
-
-                            if sleep_attempts > 2:
-                                print('Deleting alpha {} from purgatory'.format(alphas[i]['Code']) )
+                                i += 1
+                                error_attempts = 0
+                                sleep_attempts = 0
+                                time.sleep(self.pause)
+                                #  Case when alpha is not proceeded for a long period of time
+                            elif ((stats['error'] == '') & (stats['status'] == True)):
+                                print('Deleting alpha {} from purgatory'.format(alphas[i]['Code']))
                                 self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
                                 sleep_attempts = 0
                                 i += 1
 
-                        else:
-                            msg = 'Not proceeded error {}'.format(stats['error'])
-                            self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
-                            self.logger.log_print(msg, function_name='AlphaParse')
-                            error_attempts += 1
-                            time.sleep(self.pause)
+                            else:
+                                msg = 'Not proceeded error {}'.format(stats['error'])
+                                self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
+                                self.logger.log_print(msg, function_name='AlphaParse')
+                                error_attempts += 1
+                                time.sleep(self.pause)
 
-                    except Exception as e:
-                        msg = 'Parse exception occured {}'.format(e)
-                        self.logger.log_print(msg, function_name='AlphaParse')
-                        parse_attempts += 1
-                        if (parse_attempts > 3):
-                            parse_attempts = 0
-                            error_attempts += 1
+                        except Exception as e:
+                            msg = 'Parse exception occured {}'.format(e)
+                            self.logger.log_print(msg, function_name='AlphaParse')
+                            parse_attempts += 1
+                            if (parse_attempts > 3):
+                                parse_attempts = 0
+                                error_attempts += 1
+                                i += 1
+                            time.sleep(self.pause)
+                    elif ((status_content.decode('utf-8') == '"ERROR"') | (status_content.decode('utf-8') == "ERROR")):
+                        print('Error occured while simulation {}, check data or something else'.format(alphas[i]['Code']))
+                        i += 1
+                    elif (self.is_number(status_content.decode('utf-8'))):
+                        print('Alpha {} not finished simulation, {} percent proceeded'.format(alphas[i]['Code'], status_content.decode('utf-8')))
+                        time.sleep(5 * self.pause)
+                        sleep_attempts += 1
+                        if sleep_attempts > 10:
+                            print('Alpha {} has been processing too long, start to parse next alpha'.format(alphas[i]['Code']))
+                            sleep_attempts = 0
                             i += 1
-                        time.sleep(self.pause)
+                    else:
+                        print('Not proceeded case {}'.format(status_content.decode('utf-8')))
+                        i += 1
+
 
                 except Exception as e:
                     msg = 'Local exception occured {}'.format(e)

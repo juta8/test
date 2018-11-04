@@ -2,6 +2,7 @@ import requests
 import alpha_parser
 import alpha_client
 import alpha_requestor
+import utils
 import logger
 import pymongo
 import time
@@ -12,6 +13,7 @@ from bson.objectid import ObjectId
 class AlphaMode:
     def __init__(self, user_name):
         self.user_name = user_name
+
         config_fn = "config.json"
         with open(config_fn, 'r') as f:
             config = json.load(f)
@@ -46,6 +48,7 @@ class AlphaMode:
             xsrf=self.xsrf,
             site_address=self.site_address,
             proxies=self.proxies)
+        self.utils = utils.Utils(user_name=self.user_name)
 
 
     def simulate_base_pack(self, pack_number=500):
@@ -172,3 +175,109 @@ class AlphaMode:
             self.requestor.log_out(cookie)
 
         return alpha_success_submit
+
+    def touch_mode(self, cookie, iteration=1, pack_number=40, trash_iteration=12):
+        # cookie = self.requestor.log_in().cookies
+
+        # ALPHAS PACK SIMULATION FOR UPDATE
+        mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+        alphas = pd.DataFrame(list(mongo['alphas_prod'].find({'Sharpe': {'$gte': 0.8},
+                                                              'Executor': self.user_name,
+                                                              'IsTuch': True,
+                                                              'Iteration': iteration-1}).limit(pack_number)))
+        mongo[self.collection_prod].update({'_id': {'$in': [dict(alphas.iloc[i])['_id'] for i in range(alphas.shape[0])]}},
+                                           {"$set": {'IsTuch': False}})
+
+        # BUILD NEW ALPHAS
+        upgrade_alphas = []
+        for i in range(alphas.shape[0]):
+            alpha = dict(alphas.iloc[i])
+            upgrade_alphas += self.utils.random_trash(alpha=alpha, iteration=iteration, pack_number=trash_iteration)
+
+        print(upgrade_alphas)
+        # INSERT NEW ALPHAS
+        mongo[self.collection_simulate].insert(upgrade_alphas)
+
+        # SIMULATE NEW ALPHAS
+        alphas_simulate = pd.DataFrame(
+            list(
+                mongo[self.collection_simulate].find({'Status': 'InTuch', 'Executor': self.user_name}).limit(pack_number * trash_iteration)))
+        if (len(alphas_simulate) != 0):
+            ids = list(alphas_simulate['_id'])
+        else:
+            ids = []
+        self.client.simulate_alphas(cookie, ids)
+
+        # PARSE NEW ALPHAS
+        mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+        alphas_parse = pd.DataFrame(
+            list(mongo['alphas_purgatory'].find({'Status': 'InTuch', 'Executor': self.user_name}).limit(
+                pack_number * trash_iteration)))
+        if (len(alphas_parse) != 0):
+            ids = list(alphas_parse['_id'])
+        else:
+            ids = []
+        self.client.parse_alphas(cookie, ids, iteration=iteration)
+
+        # SUBMIT NEW ALPHAS
+        mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+        alphas_submit = pd.DataFrame(list(mongo['alphas_prod'].find(
+            {'Status': 'InTuch', 'Executor': self.user_name, "SubmissionId": {"$gte": 0}}).limit(
+            pack_number * trash_iteration)))
+        if (len(alphas_submit) != 0):
+            ids = list(alphas_submit['_id'])
+        else:
+            ids = []
+
+        self.client.parse_submissions(cookie, ids)
+
+        # Build logic names
+        if (iteration == 1):
+            logic_names = [dict(alphas.iloc[i])['Code'] for i in range(alphas.shape[0])]
+        else:
+            logic_names = [dict(alphas.iloc[i])['LogicName'] for i in range(alphas.shape[0])]
+        print(logic_names)
+
+        # Remove everything in trash
+        mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+        mongo[self.collection_trash].remove({'Executor': self.user_name, 'Code': {"$in": [x['Code'] for x in upgrade_alphas]}}, multi=True)
+
+        for logic_name in logic_names:
+            print(logic_name)
+            cur_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Executor': self.user_name,
+                                                                'LogicName': logic_name,
+                                                                'Iteration': iteration})))
+            print(cur_res.shape)
+            if (iteration == 1):
+                old_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Executor': self.user_name,
+                                                                     'Code': logic_name,
+                                                                     'Iteration': iteration - 1})))
+            else:
+                old_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Executor': self.user_name,
+                                                                     'LogicName': logic_name,
+                                                                     'Iteration': iteration - 1})))
+            print(old_res.shape)
+            if (cur_res.shape[0] > 0):
+                cur_max_sharpe=cur_res['Sharpe'].max()
+                old_max_sharpe=old_res['Sharpe'].max()
+
+                print('LogicName - {}, New iteration max sharpe - {}, Old Iteration max sharpe {}'.format(logic_name,
+                                                                                                          cur_max_sharpe,
+                                                                                                          old_max_sharpe))
+                if (cur_max_sharpe < old_max_sharpe + 0.05):
+                    mongo[self.collection_prod].remove({'Executor': self.user_name,
+                                                        'LogicName':  logic_name,
+                                                        'Iteration': iteration}, multi=True)
+                else:
+                    mongo[self.collection_prod].remove({'Executor': self.user_name,
+                                                        'LogicName': logic_name,
+                                                        'Iteration': iteration,
+                                                        'Sharpe': {'$lt': cur_max_sharpe}}, multi=True)
+
+
+
+
+        # self.requestor.log_out(cookie)
+
+
+

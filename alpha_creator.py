@@ -21,9 +21,13 @@ with open(cache_fn, 'r') as f:
 with open(config_fn, 'r') as f:
     config = json.load(f)
 
-fundamental = data['data']['USA']['company_fundamental']
-estimation = data['data']['USA']['company_estimation']
-relationship = data['data']['USA']['company_relationship']
+# fundamental = data['data']['USA']['company_fundamental']
+# estimation = data['data']['USA']['company_estimation']
+# relationship = data['data']['USA']['company_relationship']
+
+fundamental = data['data']['Europe']['company_fundamental']
+estimation = data['data']['Europe']['company_estimation']
+relationship = data['data']['Europe']['company_relationship']
 
 client = pymongo.MongoClient(config['mongodb_connection_string'])
 db = client.wq
@@ -60,8 +64,10 @@ if __name__ == '__main__':
             estimation_subsets = findsubsets(estimation, len(alpha_params))
             relationship_subsets = findsubsets(relationship, len(alpha_params))
 
-            for region in [data['region']['USA']]:
-                for universe in [data['universe']['TOP200']]:
+            print(len(fundamental_subsets), len(estimation_subsets), len(relationship_subsets))
+
+            for region in [data['region']['Europe']]:
+                for universe in [data['universe']['TOP100']]:
                     for neutr in [data['neutralization']['market']]:
                         print('Creating fundamental alphas')
                         for subset in fundamental_subsets:
