@@ -49,7 +49,7 @@ class alpha_client():
     # Usual usage: move alpha from purgatory to prod or trash
     def move_alpha_from_to(self, alpha, total_result, collection_old,
                            collection_new, collection_simulate, inverse=False,
-                           is_tuch=true, is_tour=true, is_mix=true):
+                           is_tuch=True, is_tour=True, is_mix=True):
         self.mongo[collection_simulate].update({'Code': alpha['Code']}, {"$set": {'Status': 'Finished'}})
         alpha_curr = list(self.mongo[collection_old].find({'Index': int(alpha['Index'])}))
 

@@ -264,7 +264,7 @@ class AlphaMode:
                 print('LogicName - {}, New iteration max sharpe - {}, Old Iteration max sharpe {}'.format(logic_name,
                                                                                                           cur_max_sharpe,
                                                                                                           old_max_sharpe))
-                if (cur_max_sharpe < old_max_sharpe + 0.05):
+                if (cur_max_sharpe < old_max_sharpe + 0.04):
                     mongo[self.collection_prod].remove({'Executor': self.user_name,
                                                         'LogicName':  logic_name,
                                                         'Iteration': iteration}, multi=True)
