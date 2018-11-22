@@ -50,9 +50,12 @@ class Utils:
         self.alpha_parser = alpha_parser.AlphaParser()
 
 
-    def random_trash(self, alpha, iteration, pack_number=12):
+    def random_trash(self, alpha, iteration, min_short=30, min_long=30, pack_number=12):
         df = pd.DataFrame(
-            list(self.mongo['alphas_prod'].aggregate([{"$match": {"Executor": self.user_name, "Region": alpha['Region']}},
+            list(self.mongo['alphas_prod'].aggregate([{"$match": {"Executor": self.user_name,
+                                                                  "Region": alpha['Region'],
+                                                                  "ShortCount": {"$gte": min_short},
+                                                                  "LongCount": {"$get": min_long}}},
                                                  {"$sample": {"size": pack_number}}])))
         alphas = list(df['Code'])
         new_alphas_code = ['indneutralize(rank({}), 5 * rank({}) + 0.5)'.format(alpha['Code'], x) for x in alphas]
@@ -66,6 +69,10 @@ class Utils:
                 alpha_logic=alpha['Code']
             else:
                 alpha_logic=alpha['LogicName']
+            try:
+                alpha_params=alpha['Params']
+            except:
+                alpha_params=[]
             alpha_info = self.alpha_parser.report_alpha(alpha=new_alphas[i], alpha_code=new_alphas_code[i],
                                                    alpha_executor=self.user_name,
                                                    alpha_type=alpha['Type'],
@@ -74,8 +81,46 @@ class Utils:
                                                    universe=alpha['Universe'],
                                                    neutr=alpha['Neutralization'],
                                                    status="InTuch",
-                                                   iteration=iteration)
+                                                   iteration=iteration,
+                                                   params=alpha_params)
 
             alphas.append(alpha_info)
         return alphas
 
+
+    def mix_trash(self, alpha, iteration, min_short=30, min_long=30, pack_number=12):
+        df = pd.DataFrame(
+            list(self.mongo['alphas_prod'].aggregate([{"$match": {"Executor": self.user_name,
+                                                                  "Region": alpha['Region'],
+                                                                  "ShortCount": {"$gte": min_short},
+                                                                  "LongCount": {"$gte": min_long}}},
+                                                 {"$sample": {"size": pack_number}}])))
+        alphas = list(df['Code'])
+        new_alphas_code = ['rank({}) * rank({})'.format(alpha['Code'], x) for x in alphas]
+        new_alphas = [self.alpha_parser.build_alpha(x, univid=alpha['Universe'],
+                                               region=alpha['Region'],
+                                               opneut=alpha['Neutralization'],
+                                               decay="12") for x in new_alphas_code]
+        alphas = []
+        for i in range(len(new_alphas)):
+            if (iteration == 1):
+                alpha_logic=alpha['Code']
+            else:
+                alpha_logic=alpha['LogicName']
+            try:
+                alpha_params = alpha['Params']
+            except:
+                alpha_params = []
+            alpha_info = self.alpha_parser.report_alpha(alpha=new_alphas[i], alpha_code=new_alphas_code[i],
+                                                   alpha_executor=self.user_name,
+                                                   alpha_type=alpha['Type'],
+                                                   logic_name=alpha_logic,
+                                                   region=alpha['Region'],
+                                                   universe=alpha['Universe'],
+                                                   neutr=alpha['Neutralization'],
+                                                   status="InMix",
+                                                   iteration=iteration,
+                                                   params=alpha_params)
+
+            alphas.append(alpha_info)
+        return alphas

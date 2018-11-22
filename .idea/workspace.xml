@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="75561075-4cf9-4976-a60d-3fa87232fc6b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alpha_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_client.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alpha_creator.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_creator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/alpha_mode.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_mode.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/workflow.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/alpha_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/da_client.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/da_client.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -84,8 +85,8 @@
       <file leaf-file-name="alpha_creator.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/alpha_creator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="425">
-              <caret line="33" selection-start-line="33" selection-end-line="33" selection-end-column="41" />
+            <state relative-caret-position="357">
+              <caret line="66" selection-start-line="66" selection-end-line="66" />
             </state>
           </provider>
         </entry>
@@ -93,8 +94,8 @@
       <file leaf-file-name="alpha_parser.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/alpha_parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="816">
-              <caret line="50" column="24" selection-start-line="50" selection-start-column="8" selection-end-line="50" selection-end-column="24" />
+            <state relative-caret-position="446">
+              <caret line="48" column="37" selection-start-line="48" selection-start-column="37" selection-end-line="48" selection-end-column="37" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -102,11 +103,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="utils.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="utils.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="765">
-              <caret line="54" column="38" selection-start-line="54" selection-start-column="36" selection-end-line="54" selection-end-column="38" />
+            <state relative-caret-position="127">
+              <caret line="93" column="84" lean-forward="true" selection-start-line="93" selection-start-column="84" selection-end-line="93" selection-end-column="84" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -119,11 +120,11 @@
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file leaf-file-name="alpha_client.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="alpha_client.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/alpha_client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="57" column="59" selection-start-line="57" selection-start-column="59" selection-end-line="57" selection-end-column="59" />
+            <state relative-caret-position="17">
+              <caret line="310" column="43" selection-start-line="310" selection-start-column="43" selection-end-line="310" selection-end-column="43" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -134,8 +135,8 @@
       <file leaf-file-name="alpha_mode.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/alpha_mode.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="266" column="58" selection-start-line="266" selection-start-column="58" selection-end-line="266" selection-end-column="58" />
+            <state relative-caret-position="17">
+              <caret line="284" column="29" lean-forward="true" selection-start-line="284" selection-start-column="29" selection-end-line="284" selection-end-column="29" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -147,10 +148,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>mongo_alphas_collection_name</find>
-      <find>mongo_alphas_</find>
-      <find>json</find>
-      <find>alpha</find>
       <find>pd.</find>
       <find>.db</find>
       <find>aplha</find>
@@ -177,6 +174,10 @@
       <find>print(logic</find>
       <find>print(</find>
       <find>iteration</find>
+      <find>parse_</find>
+      <find>trash</find>
+      <find>tuch</find>
+      <find>trash_iteration</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -194,15 +195,15 @@
         <option value="$PROJECT_DIR$/alpha_requestor.py" />
         <option value="$PROJECT_DIR$/config.json" />
         <option value="$PROJECT_DIR$/data.json" />
-        <option value="$PROJECT_DIR$/alpha_creator.py" />
-        <option value="$PROJECT_DIR$/alpha_parser.py" />
-        <option value="$PROJECT_DIR$/utils.py" />
-        <option value="$PROJECT_DIR$/alpha_mode.py" />
         <option value="$PROJECT_DIR$/alpha_client.py" />
+        <option value="$PROJECT_DIR$/alpha_parser.py" />
+        <option value="$PROJECT_DIR$/alpha_creator.py" />
+        <option value="$PROJECT_DIR$/alpha_mode.py" />
+        <option value="$PROJECT_DIR$/utils.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="-72" />
     <option name="y" value="24" />
     <option name="width" value="1920" />
@@ -258,7 +259,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
+    <frame x="-7" y="-7" width="1295" height="695" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20906201" />
@@ -282,21 +283,21 @@
     <layout-to-restore>
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20921156" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Python Console" order="10" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Terminal" order="8" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Message" order="0" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Python Console" order="10" />
     </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -568,47 +569,47 @@
     <entry file="file://$PROJECT_DIR$/run.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/alpha_client.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="310" column="43" selection-start-line="310" selection-start-column="43" selection-end-line="310" selection-end-column="43" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/alpha_creator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="33" selection-start-line="33" selection-end-line="33" selection-end-column="41" />
+        <state relative-caret-position="357">
+          <caret line="66" selection-start-line="66" selection-end-line="66" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/alpha_parser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="816">
-          <caret line="50" column="24" selection-start-line="50" selection-start-column="8" selection-end-line="50" selection-end-column="24" />
+        <state relative-caret-position="446">
+          <caret line="48" column="37" selection-start-line="48" selection-start-column="37" selection-end-line="48" selection-end-column="37" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="765">
-          <caret line="54" column="38" selection-start-line="54" selection-start-column="36" selection-end-line="54" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/alpha_mode.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="266" column="58" selection-start-line="266" selection-start-column="58" selection-end-line="266" selection-end-column="58" />
+        <state relative-caret-position="17">
+          <caret line="284" column="29" lean-forward="true" selection-start-line="284" selection-start-column="29" selection-end-line="284" selection-end-column="29" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/alpha_client.py">
+    <entry file="file://$PROJECT_DIR$/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="57" column="59" selection-start-line="57" selection-start-column="59" selection-end-line="57" selection-end-column="59" />
+        <state relative-caret-position="127">
+          <caret line="93" column="84" lean-forward="true" selection-start-line="93" selection-start-column="84" selection-end-line="93" selection-end-column="84" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>

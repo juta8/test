@@ -64,7 +64,7 @@ if __name__ == '__main__':
             estimation_subsets = findsubsets(estimation, len(alpha_params))
             relationship_subsets = findsubsets(relationship, len(alpha_params))
 
-            print(len(fundamental_subsets), len(estimation_subsets), len(relationship_subsets))
+            # print(len(fundamental_subsets), len(estimation_subsets), len(relationship_subsets))
 
             for region in [data['region']['Europe']]:
                 for universe in [data['universe']['TOP100']]:
@@ -76,31 +76,31 @@ if __name__ == '__main__':
                             alpha = alpha_parser.build_alpha(alpha_code, univid=universe, region=region, opneut=neutr, decay="12")
                             alpha_info = alpha_parser.report_alpha(alpha = alpha, alpha_code = alpha_code, alpha_executor = alpha_executor,
                                                       alpha_type='Fundamental', logic_name =logic_name, region = region,
-                                                      universe=universe, neutr = neutr)
+                                                      universe=universe, neutr = neutr, params=sorted(list(subset)))
 
                             alphas.append(alpha_info)
 
-                        print('Creating estimation alphas')
-                        for subset in estimation_subsets:
-                            value_dict = dict(zip(alpha_params, subset))
-                            alpha_code = fmt.format(alpha_logic, **value_dict)
-                            alpha = alpha_parser.build_alpha(alpha_code, univid=universe, region=region, opneut=neutr, decay="12")
-                            alpha_info = alpha_parser.report_alpha(alpha=alpha, alpha_code=alpha_code, alpha_executor=alpha_executor,
-                                                      alpha_type='Estimation', logic_name=logic_name, region=region,
-                                                      universe=universe, neutr=neutr)
-
-                            alphas.append(alpha_info)
-
-                        print('Creating relationship alphas')
-                        for subset in relationship_subsets:
-                            value_dict = dict(zip(alpha_params, subset))
-                            alpha_code = fmt.format(alpha_logic, **value_dict)
-                            alpha = alpha_parser.build_alpha(alpha_code, univid=universe, region=region, opneut=neutr, decay="12")
-                            alpha_info = alpha_parser.report_alpha(alpha=alpha, alpha_code=alpha_code, alpha_executor=alpha_executor,
-                                                      alpha_type='Relationship', logic_name=logic_name, region=region,
-                                                      universe=universe, neutr=neutr)
-
-                            alphas.append(alpha_info)
+                        # print('Creating estimation alphas')
+                        # for subset in estimation_subsets:
+                        #     value_dict = dict(zip(alpha_params, subset))
+                        #     alpha_code = fmt.format(alpha_logic, **value_dict)
+                        #     alpha = alpha_parser.build_alpha(alpha_code, univid=universe, region=region, opneut=neutr, decay="12")
+                        #     alpha_info = alpha_parser.report_alpha(alpha=alpha, alpha_code=alpha_code, alpha_executor=alpha_executor,
+                        #                               alpha_type='Estimation', logic_name=logic_name, region=region,
+                        #                               universe=universe, neutr=neutr)
+                        #
+                        #     alphas.append(alpha_info)
+                        #
+                        # print('Creating relationship alphas')
+                        # for subset in relationship_subsets:
+                        #     value_dict = dict(zip(alpha_params, subset))
+                        #     alpha_code = fmt.format(alpha_logic, **value_dict)
+                        #     alpha = alpha_parser.build_alpha(alpha_code, univid=universe, region=region, opneut=neutr, decay="12")
+                        #     alpha_info = alpha_parser.report_alpha(alpha=alpha, alpha_code=alpha_code, alpha_executor=alpha_executor,
+                        #                               alpha_type='Relationship', logic_name=logic_name, region=region,
+                        #                               universe=universe, neutr=neutr)
+                        #
+                        #     alphas.append(alpha_info)
 
             print('Created {} alphas'.format(len(alphas)))
             db['alphas_simulate'].insert(alphas)
