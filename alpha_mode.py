@@ -299,7 +299,6 @@ class AlphaMode:
             alpha = dict(alphas.iloc[i])
             upgrade_alphas += self.utils.mix_trash(alpha=alpha, iteration=iteration, pack_number=mix_iteration)
 
-        print(upgrade_alphas)
         # INSERT NEW ALPHAS
         mongo[self.collection_simulate].insert(upgrade_alphas)
 
@@ -342,18 +341,17 @@ class AlphaMode:
             logic_names = [dict(alphas.iloc[i])['Code'] for i in range(alphas.shape[0])]
         else:
             logic_names = [dict(alphas.iloc[i])['LogicName'] for i in range(alphas.shape[0])]
-        print(logic_names)
 
         # Remove everything in trash
         mongo = pymongo.MongoClient(self.mongo_connection_string).wq
         mongo[self.collection_trash].remove({'Executor': self.user_name, 'Code': {"$in": [x['Code'] for x in upgrade_alphas]}}, multi=True)
 
         for logic_name in logic_names:
-            print(logic_name)
+            # print(logic_name)
             cur_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Executor': self.user_name,
                                                                 'LogicName': logic_name,
                                                                 'Iteration': iteration})))
-            print(cur_res.shape)
+            # print(cur_res.shape)
             if (iteration == 1):
                 old_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Executor': self.user_name,
                                                                      'Code': logic_name,
@@ -362,7 +360,7 @@ class AlphaMode:
                 old_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Executor': self.user_name,
                                                                      'LogicName': logic_name,
                                                                      'Iteration': iteration - 1})))
-            print(old_res.shape)
+            # print(old_res.shape)
             if (cur_res.shape[0] > 0):
                 cur_max_sharpe=cur_res['Sharpe'].max()
                 old_max_sharpe=old_res['Sharpe'].max()

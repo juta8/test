@@ -176,11 +176,11 @@ class alpha_client():
 
                     status = self.requestor.progress_alpha(cookie, alphas[i]['Index'])
                     status_content = status.content
-                    print(status_content)
+
                     if ((status_content.decode('utf-8') == '"DONE"') | (status_content.decode('utf-8') == "DONE")):
                         stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
                                                                       index=alphas[i]['Index']).content)
-                        print(stats)
+
                         try:
                             if (stats['error'] == '') & (stats['result'] == None) & (stats['status'] == False):
                                 print("Deleting old alpha from purgatory {}".format(alphas[i]['Code']))
@@ -291,7 +291,7 @@ class alpha_client():
                             sleep_attempts = 0
                             i += 1
                     else:
-                        print('Not proceeded case {}'.format(status_content.decode('utf-8')))
+                        print('Not proceeded case, status content is {}, {}'.format(status_content.decode('utf-8'), status))
                         i += 1
 
 
