@@ -382,3 +382,6 @@ class AlphaMode:
 
 
         self.requestor.log_out(cookie)
+
+    def upgrade_one_mode(self, alpha = None, mix_iteration=12):
+        print("")

@@ -181,6 +181,7 @@ class alpha_client():
                         stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
                                                                       index=alphas[i]['Index']).content)
 
+                        # print(stats)
                         try:
                             if (stats['error'] == '') & (stats['result'] == None) & (stats['status'] == False):
                                 print("Deleting old alpha from purgatory {}".format(alphas[i]['Code']))
@@ -198,7 +199,8 @@ class alpha_client():
                                 elif abs(result['Fitness']) < 0.9:
                                     inverse = result['Fitness'] < 0
                                     result = self.alpha_stats_abs(total_result=result)
-                                    self.move_alpha_from_to(alpha=alphas[i],
+                                    if (result['ShortCount'] > 20 & result['LongCount'] > 20):
+                                        self.move_alpha_from_to(alpha=alphas[i],
                                                             total_result=result,
                                                             collection_old=self.collection_purgatory,
                                                             collection_new=self.collection_trash,
@@ -208,9 +210,10 @@ class alpha_client():
                                                             is_mix=False,
                                                             is_tour=False)
                                 elif (abs(result['Fitness']) < 1.1) | (abs(result['Sharpe']) < 1.25):
-                                    inverse = result['Fitness'] < 0
-                                    result = self.alpha_stats_abs(total_result=result)
-                                    self.move_alpha_from_to(alpha=alphas[i],
+                                    if (result['ShortCount'] > 20 & result['LongCount'] > 20):
+                                        inverse = result['Fitness'] < 0
+                                        result = self.alpha_stats_abs(total_result=result)
+                                        self.move_alpha_from_to(alpha=alphas[i],
                                                             total_result=result,
                                                             collection_old=self.collection_purgatory,
                                                             collection_new=self.collection_prod,
@@ -220,8 +223,9 @@ class alpha_client():
                                                             is_tour=is_tour,
                                                             is_mix=is_mix)
                                 elif (result['Fitness'] > 1.1) & (result['Sharpe'] > 1.25):
-                                    inverse = False
-                                    self.move_alpha_from_to(alpha=alphas[i],
+                                    if (result['ShortCount'] > 20 & result['LongCount'] > 20):
+                                        inverse = False
+                                        self.move_alpha_from_to(alpha=alphas[i],
                                                             total_result=result,
                                                             collection_old=self.collection_purgatory,
                                                             collection_new=self.collection_prod,
