@@ -292,6 +292,8 @@ class alpha_client():
                             i += 1
                     else:
                         print('Not proceeded case, status content is {}, {}'.format(status_content.decode('utf-8'), status))
+                        print('Deleting alpha {}'.format(alphas[i]['Code']))
+                        self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
                         i += 1
 
 

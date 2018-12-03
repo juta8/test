@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="75561075-4cf9-4976-a60d-3fa87232fc6b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/alpha_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/alpha_mode.py" beforeDir="false" afterPath="$PROJECT_DIR$/alpha_mode.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/da_client.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/da_client.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mg_client.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/mg_client.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nk_client.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/nk_client.ipynb" afterDir="false" />
@@ -55,11 +53,11 @@
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/alpha_client.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2252">
-              <caret line="287" column="43" lean-forward="true" selection-start-line="287" selection-start-column="43" selection-end-line="287" selection-end-column="43" />
+            <state relative-caret-position="3795">
+              <caret line="294" column="76" selection-start-line="294" selection-start-column="76" selection-end-line="294" selection-end-column="76" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -67,11 +65,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/alpha_mode.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="17">
-              <caret line="284" column="29" selection-start-line="284" selection-start-column="29" selection-end-line="284" selection-end-column="29" />
+              <caret line="56" column="12" lean-forward="true" selection-start-line="56" selection-start-column="12" selection-end-line="56" selection-end-column="12" />
               <folding>
                 <element signature="e#0#15#0" expanded="true" />
               </folding>
@@ -83,7 +81,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>.db</find>
       <find>aplha</find>
       <find>key</find>
       <find>Insert</find>
@@ -113,6 +110,7 @@
       <find>trash_iteration</find>
       <find>print</find>
       <find>not proceeded case</find>
+      <find>dele</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -326,20 +324,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/alpha_mode.py">
+    <entry file="file://$PROJECT_DIR$/alpha_client.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="284" column="29" selection-start-line="284" selection-start-column="29" selection-end-line="284" selection-end-column="29" />
+        <state relative-caret-position="3795">
+          <caret line="294" column="76" selection-start-line="294" selection-start-column="76" selection-end-line="294" selection-end-column="76" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/alpha_client.py">
+    <entry file="file://$PROJECT_DIR$/alpha_mode.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2252">
-          <caret line="287" column="43" lean-forward="true" selection-start-line="287" selection-start-column="43" selection-end-line="287" selection-end-column="43" />
+        <state relative-caret-position="17">
+          <caret line="56" column="12" lean-forward="true" selection-start-line="56" selection-start-column="12" selection-end-line="56" selection-end-column="12" />
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
