@@ -383,5 +383,114 @@ class AlphaMode:
 
         self.requestor.log_out(cookie)
 
-    def upgrade_one_mode(self, alpha = None, mix_iteration=12):
-        print("")
+    def upgrade_one_mode(self, iteration=1, mix_iteration=12, max_iteration=20):
+        cookie = self.requestor.log_in().cookies
+        sharpe = 0
+
+        alphas = pd.DataFrame(columns=['A'])
+        while ((sharpe < 2) & (iteration < max_iteration)):
+            # ALPHAS PACK SIMULATION FOR UPDATE
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+            if alphas.shape[0] == 0:
+                alphas = pd.DataFrame(list(mongo['alphas_prod'].find({'Sharpe': {'$gte': 0.7},
+                                                                  'Executor': self.user_name,
+                                                                  'ShortCount': {'$gte': 30},
+                                                                  'LongCount': {'$gte': 30},
+                                                                  'IsUp': True,
+                                                                  'Iteration': iteration - 1}).limit(1)))
+
+            print("Alpha ---- {}, iteration ---- {}".format(dict(alphas.iloc[0]), iteration))
+            mongo[self.collection_prod].update(
+                {'_id': {'$in': [dict(alphas.iloc[i])['_id'] for i in range(alphas.shape[0])]}},
+                {"$set": {'IsUp': False}})
+
+            # BUILD NEW ALPHAS
+            upgrade_alphas = self.utils.mix_trash(alpha=alphas.iloc[0], iteration=iteration, pack_number=mix_iteration, status="InUp")
+
+            # INSERT NEW ALPHAS
+            mongo[self.collection_simulate].insert(upgrade_alphas)
+
+            if (iteration == 1):
+                logic_names = [dict(alphas.iloc[0])['Code']]
+            else:
+                logic_names = [dict(alphas.iloc[0])['LogicName']]
+            logic_name = logic_names[0]
+            print(logic_name)
+
+            # SIMULATE NEW ALPHAS
+            alphas_simulate = pd.DataFrame(
+                list(
+                    mongo[self.collection_simulate].find({'Status': 'InUp',
+                                                          'LogicName': logic_name,
+                                                          'Executor': self.user_name,
+                                                          'Iteration': iteration})
+                        .limit(2 * mix_iteration)))
+            if (len(alphas_simulate) != 0):
+                ids = list(alphas_simulate['_id'])
+            else:
+                ids = []
+            self.client.simulate_alphas(cookie, ids)
+
+            # PARSE NEW ALPHAS
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+            alphas_parse = pd.DataFrame(
+                list(mongo['alphas_purgatory'].find({'Status': 'InUp',
+                                                     'LogicName': logic_name,
+                                                     'Iteration': iteration,
+                                                     'Executor': self.user_name})
+                     .limit(2 * mix_iteration)))
+            if (len(alphas_parse) != 0):
+                ids = list(alphas_parse['_id'])
+            else:
+                ids = []
+            self.client.parse_alphas(cookie, ids, submit = False)
+
+            # Remove everything in trash
+            mongo = pymongo.MongoClient(self.mongo_connection_string).wq
+            trash_del = mongo[self.collection_trash].remove(
+                                            {'Executor': self.user_name, 'Code': {"$in": [x['Code'] for x in upgrade_alphas]}}, multi=True)
+
+            cur_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Status': 'InUp',
+                                                                          'Executor': self.user_name,
+                                                                          'LogicName': logic_name,
+                                                                          'Iteration': iteration})))
+            print("Cur res shape --- {}".format(cur_res.shape))
+            if (iteration == 1):
+                old_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Executor': self.user_name,
+                                                                              'Code': logic_name,
+                                                                              'Iteration': iteration - 1})))
+            else:
+                old_res = pd.DataFrame(list(mongo[self.collection_prod].find({'Status': 'InUp',
+                                                                              'Executor': self.user_name,
+                                                                              'LogicName': logic_name,
+                                                                              'Iteration': iteration - 1})))
+            print("Old res shape --- {}".format(old_res.shape))
+            if (cur_res.shape[0] > 0):
+                cur_max_sharpe = cur_res['Sharpe'].max()
+                old_max_sharpe = old_res['Sharpe'].max()
+
+                print('LogicName - {}, New iteration max sharpe - {}, Old Iteration max sharpe {}'.format(logic_name,
+                                                                                                          cur_max_sharpe,
+                                                                                                    old_max_sharpe))
+                sharpe = cur_max_sharpe
+                del_info = mongo[self.collection_prod].remove({'Status': 'InUp',
+                                                    'Executor': self.user_name,
+                                                    'LogicName': logic_name,
+                                                    'Iteration': iteration,
+                                                    'Sharpe': {'$lt': cur_max_sharpe- 0.001}}, multi=True)
+
+            else:
+                return
+
+            alphas = pd.DataFrame(list(mongo['alphas_prod'].find({'Status': 'InUp',
+                                                                  'LogicName': logic_name,
+                                                                  'Executor': self.user_name,
+                                                                  'Iteration': iteration}).limit(1)))
+            iteration += 1
+
+        submit =  self.simulate(dict(alphas.iloc[0])['Alpha'], cookie, is_login=False, is_logout=False)
+        print(submit)
+        self.requestor.log_out(cookie)
+
+
+

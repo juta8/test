@@ -88,12 +88,13 @@ class Utils:
         return alphas
 
 
-    def mix_trash(self, alpha, iteration, min_short=30, min_long=30, pack_number=12):
+    def mix_trash(self, alpha, iteration, min_short=25, min_long=25, pack_number=12, status = "InMix"):
         df = pd.DataFrame(
             list(self.mongo['alphas_prod'].aggregate([{"$match": {"Executor": self.user_name,
                                                                   "Region": alpha['Region'],
                                                                   "ShortCount": {"$gte": min_short},
-                                                                  "LongCount": {"$gte": min_long}}},
+                                                                  "LongCount": {"$gte": min_long},
+                                                                  "Iteration": 0}},
                                                  {"$sample": {"size": pack_number}}])))
         alphas = list(df['Code'])
         new_alphas_code = ['rank({}) * rank({})'.format(alpha['Code'], x) for x in alphas]
@@ -118,7 +119,7 @@ class Utils:
                                                    region=alpha['Region'],
                                                    universe=alpha['Universe'],
                                                    neutr=alpha['Neutralization'],
-                                                   status="InMix",
+                                                   status=status,
                                                    iteration=iteration,
                                                    params=alpha_params)
 

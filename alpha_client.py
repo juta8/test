@@ -49,7 +49,7 @@ class alpha_client():
     # Usual usage: move alpha from purgatory to prod or trash
     def move_alpha_from_to(self, alpha, total_result, collection_old,
                            collection_new, collection_simulate, inverse=False,
-                           is_tuch=True, is_tour=True, is_mix=True):
+                           is_tuch=True, is_tour=True, is_mix=True, is_up = True):
         self.mongo[collection_simulate].update({'Code': alpha['Code']}, {"$set": {'Status': 'Finished'}})
         alpha_curr = list(self.mongo[collection_old].find({'Index': int(alpha['Index'])}))
 
@@ -63,6 +63,7 @@ class alpha_client():
         alpha_curr['IsTuch'] = is_tuch
         alpha_curr['IsTour'] = is_tour
         alpha_curr['IsMix'] = is_mix
+        alpha_curr['IsUp'] = is_up
 
         self.mongo[collection_new].insert(alpha_curr)
         self.mongo[collection_new].update({'Index': alpha['Index']}, {"$set": total_result})
@@ -157,7 +158,7 @@ class alpha_client():
         print("")
 
     def parse_alphas(self, cookie, ids, id_type=False,
-                     submit=True, is_tuch=True, is_tour=True, is_mix=True):
+                     submit=True, is_tuch=True, is_tour=True, is_mix=True, is_up = True):
         print("Function parsing alphas started")
         if id_type:
             alphas = list(self.mongo[self.collection_purgatory].find({"AlphaId": {"$in": ids}}))
@@ -168,6 +169,7 @@ class alpha_client():
         error_attempts = 0
         parse_attempts = 0
         sleep_attempts = 0
+
 
         while i < len(alphas):
             if error_attempts < self.max_error_attempts:
@@ -191,6 +193,7 @@ class alpha_client():
 
                             elif (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
                                 result = stats['result'][-1]
+                                print(result)
                                 if abs(result['Fitness']) < 0.35:
                                     self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
                                     self.mongo[self.collection_simulate].remove({'Code': alphas[i]['Code']}, multi=True)
@@ -208,9 +211,12 @@ class alpha_client():
                                                             inverse=inverse,
                                                             is_tuch=False,
                                                             is_mix=False,
-                                                            is_tour=False)
+                                                            is_tour=False,
+                                                            is_up=False)
                                 elif (abs(result['Fitness']) < 1.1) | (abs(result['Sharpe']) < 1.25):
-                                    if (result['ShortCount'] > 20 & result['LongCount'] > 20):
+                                    print("Case big fittness {}, {}".format(result['ShortCount'], result['LongCount']))
+                                    if ((result['ShortCount'] >= 20) & (result['LongCount'] >= 20)):
+                                        print("Case not concentrated, {}".format(alphas[i]))
                                         inverse = result['Fitness'] < 0
                                         result = self.alpha_stats_abs(total_result=result)
                                         self.move_alpha_from_to(alpha=alphas[i],
@@ -221,7 +227,10 @@ class alpha_client():
                                                             inverse=inverse,
                                                             is_tuch=is_tuch,
                                                             is_tour=is_tour,
-                                                            is_mix=is_mix)
+                                                            is_mix=is_mix,
+                                                            is_up = is_up)
+                                    else:
+                                        print('Delete alpha, weight too concentrated, {}, {}'.format(result['ShortCount'], result['LongCount']))
                                 elif (result['Fitness'] > 1.1) & (result['Sharpe'] > 1.25):
                                     if (result['ShortCount'] > 20 & result['LongCount'] > 20):
                                         inverse = False
@@ -233,18 +242,22 @@ class alpha_client():
                                                             inverse=inverse,
                                                             is_tuch=is_tuch,
                                                             is_tour=is_tour,
-                                                            is_mix=is_mix
+                                                            is_mix=is_mix,
+                                                            is_up = is_up
                                                             )
 
-                                    if submit:
-                                        alpha_id = json.loads(self.requestor.get_alphaid(cookie, alphas[i]['Index']).content)['result']['clientAlphaId']
-                                        print('AlphaId {}'.format(alpha_id))
-                                        submission_id = json.loads(self.requestor.get_submissionid(cookie, alpha_id).content)['result']['RequestId']
-                                        print('SubmissionId {}'.format(submission_id))
-                                        self.mongo[self.collection_prod].update({'Index': alphas[i]['Index']},
-                                                                            {"$set": {"AlphaId": alpha_id,
-                                                                                      "SubmissionId": submission_id,
-                                                                              "SubmissionStatus": "InProgress"}})
+
+                                        if submit:
+                                            alpha_id = json.loads(self.requestor.get_alphaid(cookie, alphas[i]['Index']).content)['result']['clientAlphaId']
+                                            print('AlphaId {}'.format(alpha_id))
+                                            submission_id = json.loads(self.requestor.get_submissionid(cookie, alpha_id).content)['result']['RequestId']
+                                            print('SubmissionId {}'.format(submission_id))
+                                            self.mongo[self.collection_prod].update({'Index': alphas[i]['Index']},
+                                                                                {"$set": {"AlphaId": alpha_id,
+                                                                                          "SubmissionId": submission_id,
+                                                                                  "SubmissionStatus": "InProgress"}})
+                                    else:
+                                        print('Delete alpha, weight too concentrated')
 
                                 elif (result['Fitness'] < - 1.1) & (result['Sharpe'] < -1.25):
                                     self.mongo[self.collection_simulate].update({'Code': alphas[i]['Code']},
@@ -287,10 +300,10 @@ class alpha_client():
                         print('Error occured while simulation {}, check data or something else'.format(alphas[i]['Code']))
                         i += 1
                     elif (self.is_number(status_content.decode('utf-8'))):
-                        print('Alpha {} not finished simulation, {} percent proceeded'.format(alphas[i]['Code'], status_content.decode('utf-8')))
-                        time.sleep(5 * self.pause)
+                        print('Alpha not finished simulation, {} percent proceeded'.format(status_content.decode('utf-8')))
+                        time.sleep(10 * self.pause)
                         sleep_attempts += 1
-                        if sleep_attempts > 10:
+                        if sleep_attempts > 100:
                             print('Alpha {} has been processing too long, start to parse next alpha'.format(alphas[i]['Code']))
                             sleep_attempts = 0
                             i += 1
