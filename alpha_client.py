@@ -193,7 +193,7 @@ class alpha_client():
 
                             elif (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
                                 result = stats['result'][-1]
-                                print(result)
+                                # print(result)
                                 if abs(result['Fitness']) < 0.35:
                                     self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
                                     self.mongo[self.collection_simulate].remove({'Code': alphas[i]['Code']}, multi=True)
@@ -215,8 +215,7 @@ class alpha_client():
                                                             is_up=False)
                                 elif (abs(result['Fitness']) < 1.1) | (abs(result['Sharpe']) < 1.25):
                                     print("Case big fittness {}, {}".format(result['ShortCount'], result['LongCount']))
-                                    if ((result['ShortCount'] >= 20) & (result['LongCount'] >= 20)):
-                                        print("Case not concentrated, {}".format(alphas[i]))
+                                    if (result['ShortCount'] >= 20 + result['LongCount'] >= 20):
                                         inverse = result['Fitness'] < 0
                                         result = self.alpha_stats_abs(total_result=result)
                                         self.move_alpha_from_to(alpha=alphas[i],
@@ -232,7 +231,7 @@ class alpha_client():
                                     else:
                                         print('Delete alpha, weight too concentrated, {}, {}'.format(result['ShortCount'], result['LongCount']))
                                 elif (result['Fitness'] > 1.1) & (result['Sharpe'] > 1.25):
-                                    if (result['ShortCount'] > 20 & result['LongCount'] > 20):
+                                    if (result['ShortCount'] + result['LongCount'] >= 20):
                                         inverse = False
                                         self.move_alpha_from_to(alpha=alphas[i],
                                                             total_result=result,
@@ -348,6 +347,9 @@ class alpha_client():
                     print('Parsing submission of alpha with index {}'.format(alphas[i]['Index']))
                     try:
                         submission = self.requestor.get_submission_result(cookie, alphas[i]['SubmissionId'])
+                        print(submission)
+                        print(submission.content)
+
                         result = json.loads(submission.content)
                         print(result)
                         if result['status'] == False:
