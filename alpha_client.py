@@ -94,7 +94,7 @@ class alpha_client():
                 try:
                     alpha = alphas[i]['Alpha']
                     alpha_code = alphas[i]['Code']
-                    print('Simulating alpha {}'.format(alpha_code))
+                    # print('Simulating alpha {}'.format(alpha_code))
 
                     response = json.loads(self.requestor.simulate_alpha(cookie=cookie,
                                                                         alpha=alpha).content)
@@ -174,7 +174,7 @@ class alpha_client():
         while i < len(alphas):
             if error_attempts < self.max_error_attempts:
                 try:
-                    print('Parsing alpha {}'.format(alphas[i]['Code']))
+                    # print('Parsing alpha {}'.format(alphas[i]['Code']))
 
                     status = self.requestor.progress_alpha(cookie, alphas[i]['Index'])
                     status_content = status.content
@@ -182,7 +182,6 @@ class alpha_client():
                     if ((status_content.decode('utf-8') == '"DONE"') | (status_content.decode('utf-8') == "DONE")):
                         stats = json.loads(self.requestor.stats_alpha(cookie=cookie,
                                                                       index=alphas[i]['Index']).content)
-
                         # print(stats)
                         try:
                             if (stats['error'] == '') & (stats['result'] == None) & (stats['status'] == False):
@@ -193,7 +192,6 @@ class alpha_client():
 
                             elif (stats['error'] == '') & (stats['status'] == True)& (len(stats['result']) > 0):
                                 result = stats['result'][-1]
-                                # print(result)
                                 if abs(result['Fitness']) < 0.35:
                                     self.mongo[self.collection_purgatory].remove({'Code': alphas[i]['Code']}, multi=True)
                                     self.mongo[self.collection_simulate].remove({'Code': alphas[i]['Code']}, multi=True)
@@ -214,8 +212,8 @@ class alpha_client():
                                                             is_tour=False,
                                                             is_up=False)
                                 elif (abs(result['Fitness']) < 1.1) | (abs(result['Sharpe']) < 1.25):
-                                    print("Case big fittness {}, {}".format(result['ShortCount'], result['LongCount']))
-                                    if (result['ShortCount'] >= 20 + result['LongCount'] >= 20):
+                                    # print("Case big fittness {}, {}".format(result['ShortCount'], result['LongCount']))
+                                    if (result['ShortCount'] + result['LongCount'] >= 20):
                                         inverse = result['Fitness'] < 0
                                         result = self.alpha_stats_abs(total_result=result)
                                         self.move_alpha_from_to(alpha=alphas[i],
@@ -228,8 +226,6 @@ class alpha_client():
                                                             is_tour=is_tour,
                                                             is_mix=is_mix,
                                                             is_up = is_up)
-                                    else:
-                                        print('Delete alpha, weight too concentrated, {}, {}'.format(result['ShortCount'], result['LongCount']))
                                 elif (result['Fitness'] > 1.1) & (result['Sharpe'] > 1.25):
                                     if (result['ShortCount'] + result['LongCount'] >= 20):
                                         inverse = False
